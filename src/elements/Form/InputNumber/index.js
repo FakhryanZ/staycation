@@ -4,9 +4,18 @@ import propTypes from "prop-types";
 import "./index.scss";
 
 export default function Number(props) {
-  const { value, placeholder, name, min, max, prefix, suffix } = props;
+  const {
+    value,
+    placeholder,
+    name,
+    min,
+    max,
+    prefix,
+    suffix,
+    isSuffixPlural,
+  } = props;
 
-  const { InputValue, setInputValue } = useState(`${prefix}${value}${suffix}`);
+  const [InputValue, setInputValue] = useState(`${prefix}${value}${suffix}`);
 
   const onChange = (e) => {
     let value = String(e.target.value);
@@ -15,7 +24,6 @@ export default function Number(props) {
 
     const patternNumeric = new RegExp("[0-9]*");
     const isNumeric = patternNumeric.test(value);
-
     if (isNumeric && +value <= max && +value >= min) {
       props.onChange({
         target: {
@@ -23,7 +31,9 @@ export default function Number(props) {
           value: +value,
         },
       });
-      setInputValue(`${prefix}${value}${suffix}`);
+      setInputValue(
+        `${prefix}${value}${suffix}${isSuffixPlural && value > 1 ? "s" : ""}`
+      );
     }
   };
 
@@ -38,7 +48,7 @@ export default function Number(props) {
   };
 
   const plus = () => {
-    value > min &&
+    value < max &&
       onChange({
         target: {
           name: name,
@@ -84,6 +94,7 @@ Number.defaultProps = {
 Number.propTypes = {
   value: propTypes.oneOfType([propTypes.string, propTypes.number]),
   onChange: propTypes.func,
+  isSuffixPlural: propTypes.bool,
   placeholder: propTypes.string,
   outerClassName: propTypes.string,
 };
